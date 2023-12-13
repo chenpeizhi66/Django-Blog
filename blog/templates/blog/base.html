@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+{% load static category %}
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>
+            {% block title %}
+                Personal Block design with Django Framework
+            {% endblock %}
+        </title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        {% comment %} <link rel="stylesheet" href="{% static 'users/bulma.css' %}"> {% endcomment %}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+        <link href="{% static 'mdeditor/css/editormd.min.css' %}" rel="stylesheet">
+        <link href="{% static 'mdeditor/css/editormd.preview.css' %}" rel="stylesheet">
+    </head>
+    <body>
+        <nav class="navbar is-primary container" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand">
+            <a class="navbar-item">
+                <img src="{% static 'users/images/login.jpg'%}" width="48" height="48">
+            </a>
+        
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+            </div>
+        
+            <div id="navbarBasicExample" class="navbar-menu">
+                <div class="navbar-start">
+
+                    {% block nav-start %}
+                        <a class="navbar-item" href="/">
+                            Home
+                        </a>
+            
+                    {% get_category_list as category_list %}
+                        {% for category in category_list %}
+                            <a class="navbar-item" href="{% url 'blog:category_list' category.id %}"> 
+                                {{ category.name }}
+                            </a>
+                        {% endfor %}
+                    {% endblock %}
+                </div>
+            
+                <div class="navbar-end">
+                    {% block navbar-end %}
+                    <div class="navbar-item">
+                        {% comment %} reference: https://www.tangowithdjango.com/book17/chapters/login.html  {% endcomment %}
+                        {% if user.is_authenticated %}
+                        {% comment %} if the user login, it will show user center {% endcomment %}
+                            <div class="buttons">
+                                <a href="{% url 'users:user_profile' %}" class="button is-primary">{{ request.user.username }}'s User Center</a>
+                                <a href="{% url 'users:logout' %}" class="button is-primary">Log out</a>
+                            </div>
+                        {% else %}
+                            <div class="buttons">
+                                <a class="button is-primary" href="{% url 'users:register' %}" target="_blank">
+                                    <strong>Sign up</strong>
+                                </a>
+                                <a class="button is-light" href="{% url 'users:login' %}" target="_blank">
+                                    Log in
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endblock %}
+                </div>
+            </div>
+        </nav>
+
+        <section class="section">
+            <div class="container">
+                <div class="columns">
+                    <div class="column is-8">
+                        {% block section %}
+                            {% block archives %} {% endblock %}
+
+                            {% if post_list %}
+                                {% for post in post_list %}
+                                    <div class="box">
+                                        <h1 class="is-size-5 has-text-weight-bold">
+                                            <a href="{% url 'blog:post_detail' post.id %}"> {{ post.title }} </a>
+                                        </h1>
+                                        <div class=" is-size-7 has-text-grey-light pt-1 pb-1">
+                                            <span class="mr-3">Author: {{ post.owner }}</span>  <span>Public Date: {{ post.add_date }}</span>  <span>Views: {{ post.pv }}</span>
+                                        </div>
+                                        {% comment %} reference: https://www.w3schools.com/django/ref_filters_truncatechars.php {% endcomment %}
+                                        <p class="mt-3">{{ post.desc|truncatechars:100 }}</p>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="box">
+                                    <p class="has-text-danger"> Post not exists! </p>
+                                </div>
+                            {% endif %}
+                        {% endblock%}
+                    </div>
+                    <div class="column is-4">
+                        {% block right-section %}
+                            {% get_sidebar_list as sidebar_list %}
+                                {% for sidebar in sidebar_list %}
+                                    <div class="box">
+                                        <h1 class="is-size-5 title"> {{ sidebar.title }} </h1>
+                                        <p> {{ sidebar.get_content|safe }} </p>
+                                    </div>
+                                {% endfor %}
+
+                        {% endblock %}
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% block footer %}
+            <footer class="footer container">
+                <div class="has-text-centered">
+                    end of the blog
+                </div>
+            </footer>
+        {% endblock %}
+
+        {% comment %} <h1>Query the category of the post</h1>
+        {% for category in category_list %}
+            {{ category.name }}<br/>
+            {{ category.desc }}<br/>
+        {% endfor %}
+
+        <h1>Query the post</h1>
+        {% for post in post_list %}
+            {{ post.title }}<br/>
+            {{ post.desc }}<br/>
+        {% endfor %} {% endcomment %}
+    </body>
+</html>

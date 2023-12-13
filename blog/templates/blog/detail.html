@@ -1,0 +1,34 @@
+{% extends 'blog/base.html' %}
+
+{% load markdown_extras %}
+
+{% block section %}
+    <div class="box">
+        <h1 class="is-size-5 has-text-weight-bold">
+            <a> {{ post.title }} </a>
+        </h1>
+        <div class=" is-size-7 has-text-grey-light pt-1 pb-1">
+            <span class="mr-3">Author: {{ post.owner }}</span>  <span>Public Date: {{ post.add_date }}</span>  <span>Views: {{ post.pv }}</span>
+        </div>
+        <div class="content">
+            {{ post.content|markdown|safe }}
+        </div>
+    </div>
+
+    <div class="level">
+        <div class="level-first">
+            {% if prev_post %}
+            <span>Previous: </span><a href="{% url 'blog:post_detail' prev_post.id %}"> {{ prev_post.title }} </a>
+            {% else %}
+            <a class=" has-text-danger-dark is-size-7" href="/">Home</a>
+            {% endif %}
+        </div>
+        <div class="level-right">
+            {% if next_post %}
+            <span>Next: </span><a href="{% url 'blog:post_detail' next_post.id %}" class="level-item"> {{ next_post.title }} </a>
+            {% else %}
+            <a class=" has-text-danger-dark is-size-7" href="/">Home</a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
